@@ -1,0 +1,340 @@
+# Configuración de la aplicación InnoSistemas
+# Plataforma de Integración y Desarrollo de Software para Estudiantes de Ingeniería de Sistemas
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api/v1
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+
+spring:
+  application:
+    name: innosistemas-backend
+    
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+    
+  # Configuración de base de datos PostgreSQL con Supabase
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/innosistemas}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: InnoSistemas-HikariCP
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+      validation-timeout: 5000
+      leak-detection-threshold: 60000
+
+  # Configuración JPA/Hibernate
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        generate_statistics: ${HIBERNATE_STATISTICS:false}
+        jdbc:
+          batch_size: 20
+          order_inserts: true
+          order_updates: true
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+
+  # Configuración de Spring Security
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:https://your-auth-provider.com}
+          jwk-set-uri: ${JWT_JWK_SET_URI:https://your-auth-provider.com/.well-known/jwks.json}
+
+  # Configuración de correo electrónico para notificaciones
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  # Configuración de archivos multipart para gestión de documentos
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: ${MAX_FILE_SIZE:10MB}
+      max-request-size: ${MAX_REQUEST_SIZE:50MB}
+      file-size-threshold: 2KB
+
+  # Configuración de cache (Redis opcional)
+  cache:
+    type: ${CACHE_TYPE:simple}
+    cache-names:
+      - users
+      - teams
+      - projects
+      - notifications
+
+  # Configuración de Redis (opcional para cache distribuido)
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 2000ms
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+  # Configuración de GraphQL
+  graphql:
+    graphiql:
+      enabled: ${GRAPHIQL_ENABLED:false}  # Deshabilitado por defecto (seguridad)
+      path: /graphiql
+    path: /graphql
+    schema:
+      printer:
+        enabled: ${GRAPHQL_SCHEMA_PRINTER:false}  # Deshabilitado por defecto
+      introspection:
+        enabled: ${GRAPHQL_INTROSPECTION:false}  # Deshabilitado por defecto
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080}
+      allowed-methods: GET,POST,OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
+
+# Configuración de logging
+logging:
+  level:
+    com.udea.innosistemas: ${LOG_LEVEL:INFO}
+    org.springframework.security: ${SECURITY_LOG_LEVEL:INFO}
+    org.springframework.web: ${WEB_LOG_LEVEL:INFO}
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${HIBERNATE_LOG_LEVEL:WARN}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE:logs/innosistemas.log}
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+
+# Configuración de gestión y monitoreo (Actuator)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,beans
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: ${HEALTH_SHOW_DETAILS:when_authorized}
+      show-components: always
+    info:
+      enabled: true
+  info:
+    env:
+      enabled: true
+    git:
+      mode: full
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:true}
+
+# Información de la aplicación
+info:
+  app:
+    name: InnoSistemas Backend API
+    description: Plataforma de Integración y Desarrollo de Software para Estudiantes de Ingeniería de Sistemas
+    version: 1.0.0
+    university: Universidad de Antioquia
+    faculty: Facultad de Ingeniería
+    program: Ingeniería de Sistemas
+
+# Configuración personalizada de la aplicación
+innosistemas:
+  # Configuración de autenticación
+  auth:
+    jwt:
+      secret: ${JWT_SECRET:CHANGE_THIS_SECRET_KEY_IN_PRODUCTION_USE_ENVIRONMENT_VARIABLE}
+      expiration: ${JWT_EXPIRATION:86400} # 24 horas en segundos (según tasking)
+      refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800} # 7 días en segundos (según tasking)
+    
+  # Configuración de equipos
+  teams:
+    min-members: ${TEAM_MIN_MEMBERS:2}
+    max-members: ${TEAM_MAX_MEMBERS:3}
+    
+  # Configuración de archivos y documentos
+  files:
+    upload-dir: ${FILE_UPLOAD_DIR:./uploads}
+    allowed-extensions: pdf,doc,docx,txt,zip,rar,jpg,png,gif
+    max-size-per-file: ${MAX_FILE_SIZE_BYTES:10485760} # 10MB
+    
+  # Configuración de notificaciones
+  notifications:
+    email:
+      enabled: ${EMAIL_NOTIFICATIONS:true}
+      from: ${EMAIL_FROM:noreply@innosistemas.udea.edu.co}
+      template-path: classpath:/templates/email/
+    in-app:
+      enabled: ${IN_APP_NOTIFICATIONS:true}
+      retention-days: ${NOTIFICATION_RETENTION:30}
+      
+  # Configuración de Universidad de Antioquia
+  university:
+    ldap:
+      enabled: ${LDAP_ENABLED:false}
+      url: ${LDAP_URL:ldap://ldap.udea.edu.co:389}
+      base-dn: ${LDAP_BASE_DN:dc=udea,dc=edu,dc=co}
+      user-dn-pattern: ${LDAP_USER_DN_PATTERN:uid={0},ou=people}
+      
+  # Configuración de CORS para frontend
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://innosistemas.udea.edu.co}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: Content-Type,Authorization,X-Requested-With,Accept,Origin
+    allow-credentials: true
+    max-age: 3600
+
+  # Configuración de Rate Limiting
+  ratelimit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    # Configuración por defecto para endpoints normales
+    default:
+      capacity: ${RATE_LIMIT_CAPACITY:100} # Tokens iniciales
+      refill-tokens: ${RATE_LIMIT_REFILL:100} # Tokens a rellenar
+      refill-period-minutes: ${RATE_LIMIT_PERIOD:1} # Período de relleno en minutos
+    # Configuración para endpoints de autenticación (más estricta)
+    auth:
+      capacity: ${RATE_LIMIT_AUTH_CAPACITY:10}
+      refill-tokens: ${RATE_LIMIT_AUTH_REFILL:10}
+      refill-period-minutes: ${RATE_LIMIT_AUTH_PERIOD:1}
+
+  # Configuración de Headers de Seguridad
+  security:
+    headers:
+      csp: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' http://localhost:* ws://localhost:*"
+      hsts:
+        enabled: ${HSTS_ENABLED:true}
+        max-age: ${HSTS_MAX_AGE:31536000} # 1 año
+      frame-options: ${FRAME_OPTIONS:DENY}
+
+# Configuración específica por perfil
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:mem:devdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+  cache:
+    type: simple
+  # GraphQL - Habilitar GraphiQL y introspección solo en desarrollo
+  graphql:
+    graphiql:
+      enabled: true
+    schema:
+      printer:
+        enabled: true
+      introspection:
+        enabled: true
+
+logging:
+  level:
+    com.udea.innosistemas: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+
+innosistemas:
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:8080,http://localhost:8080/api/v1
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+
+logging:
+  level:
+    com.udea.innosistemas: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  cache:
+    type: redis
+
+logging:
+  level:
+    com.udea.innosistemas: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+
+management:
+  endpoint:
+    health:
+      show-details: never

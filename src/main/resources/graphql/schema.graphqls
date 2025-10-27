@@ -1,0 +1,239 @@
+# Directiva para requerir autenticación
+directive @auth on FIELD_DEFINITION
+
+# Directiva para requerir que el usuario pertenezca a un equipo específico
+directive @requiresTeam on FIELD_DEFINITION
+
+# Directiva para requerir que el usuario pertenezca a un curso específico
+directive @requiresCourse on FIELD_DEFINITION
+
+type Query {
+    """
+    Placeholder query - GraphQL requires at least one query
+    """
+    hello: String
+
+    """
+    Obtiene la información del usuario actualmente autenticado
+    Requiere: Autenticación JWT válida
+    """
+    getCurrentUser: UserInfo! @auth
+
+    """
+    Obtiene los permisos del usuario actualmente autenticado basados en su rol
+    Requiere: Autenticación JWT válida
+    """
+    getUserPermissions: UserPermissions! @auth
+
+    """
+    Obtiene los miembros de un equipo específico
+    Estudiantes: Solo pueden ver su propio equipo
+    Profesores/Admins: Pueden ver cualquier equipo
+    Requiere: Autenticación JWT válida
+    """
+    getTeamMembers(teamId: ID!): [TeamMember!]! @auth @requiresTeam
+}
+
+type Mutation {
+    """
+    Autentica un usuario y devuelve tokens de acceso y refresh
+    """
+    login(email: String!, password: String!): AuthResponse!
+
+    """
+    Renueva el token de acceso usando un refresh token válido
+    """
+    refreshToken(refreshToken: String!): AuthResponse!
+
+    """
+    Cierra la sesión del usuario invalidando su token y sesiones activas
+    """
+    logout(token: String!): LogoutResponse!
+
+    """
+    Cierra todas las sesiones activas de un usuario en todos los dispositivos
+    """
+    logoutFromAllDevices: LogoutResponse!
+}
+
+type AuthResponse {
+    """
+    Token JWT de acceso (corta duración)
+    """
+    token: String!
+
+    """
+    Token de renovación para obtener nuevos tokens de acceso
+    """
+    refreshToken: String
+
+    """
+    Información del usuario autenticado
+    """
+    userInfo: UserInfo!
+}
+
+type LogoutResponse {
+    """
+    Indica si el logout fue exitoso
+    """
+    success: Boolean!
+
+    """
+    Mensaje descriptivo del resultado
+    """
+    message: String!
+}
+
+type UserInfo {
+    """
+    ID único del usuario
+    """
+    id: ID!
+
+    """
+    Email del usuario (usado como username)
+    """
+    email: String!
+
+    """
+    Rol del usuario en el sistema
+    """
+    role: UserRole!
+
+    """
+    ID del equipo al que pertenece el usuario (opcional)
+    """
+    teamId: ID
+
+    """
+    ID del curso al que pertenece el usuario (opcional)
+    """
+    courseId: ID
+
+    """
+    Primer nombre del usuario
+    """
+    firstName: String
+
+    """
+    Apellido del usuario
+    """
+    lastName: String
+
+    """
+    Nombre completo del usuario
+    """
+    fullName: String
+}
+
+enum UserRole {
+    """
+    Estudiante - Usuario estándar con acceso a sus equipos y proyectos
+    """
+    STUDENT
+
+    """
+    Profesor - Puede gestionar cursos, equipos y enviar notificaciones
+    """
+    PROFESSOR
+
+    """
+    Administrador - Acceso completo al sistema
+    """
+    ADMIN
+
+    """
+    Asistente de Enseñanza - Permisos limitados para ayudar al profesor
+    """
+    TA
+}
+
+type UserPermissions {
+    """
+    ID del usuario
+    """
+    userId: ID!
+
+    """
+    Rol del usuario
+    """
+    role: UserRole!
+
+    """
+    Lista de permisos específicos (ej: "user:create", "team:read")
+    """
+    permissions: [String!]!
+
+    """
+    ID del equipo al que pertenece (opcional)
+    """
+    teamId: ID
+
+    """
+    ID del curso al que pertenece (opcional)
+    """
+    courseId: ID
+
+    """
+    Puede gestionar equipos
+    """
+    canManageTeam: Boolean!
+
+    """
+    Puede gestionar cursos
+    """
+    canManageCourse: Boolean!
+
+    """
+    Puede ver todos los equipos
+    """
+    canViewAllTeams: Boolean!
+
+    """
+    Puede enviar notificaciones
+    """
+    canSendNotifications: Boolean!
+}
+
+type TeamMember {
+    """
+    ID del miembro del equipo
+    """
+    id: ID!
+
+    """
+    Email del miembro
+    """
+    email: String!
+
+    """
+    Primer nombre
+    """
+    firstName: String
+
+    """
+    Apellido
+    """
+    lastName: String
+
+    """
+    Nombre completo
+    """
+    fullName: String
+
+    """
+    Rol del miembro
+    """
+    role: UserRole!
+
+    """
+    ID del equipo
+    """
+    teamId: ID
+
+    """
+    ID del curso
+    """
+    courseId: ID
+}

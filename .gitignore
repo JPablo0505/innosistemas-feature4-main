@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+target/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+*.lcov
+
+# Docker
+docker-compose.override.yml
+
+# Spring Boot
+application-local.properties
+application-local.yml
+
+# Uploads
+uploads/
