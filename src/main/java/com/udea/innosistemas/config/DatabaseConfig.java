@@ -74,12 +74,6 @@ public class DatabaseConfig {
     @Value("${spring.jpa.show-sql:false}" )
     private boolean showSql;
 
-    /**
-     * Configuración del DataSource principal usando HikariCP
-     * HikariCP es recomendado por su alto rendimiento y eficiencia
-     * 
-     * @return DataSource configurado
-     */
     @Bean
     @Primary
     @Profile("!test")
@@ -88,25 +82,21 @@ public class DatabaseConfig {
         
         HikariConfig config = new HikariConfig();
         
-        // Configuración básica de conexión
         config.setJdbcUrl(databaseUrl);
         config.setUsername(databaseUsername);
         config.setPassword(databasePassword);
         config.setDriverClassName(databaseDriver);
         
-        // Configuración del pool de conexiones
         config.setMaximumPoolSize(maxPoolSize);
         config.setMinimumIdle(minIdle);
         config.setIdleTimeout(idleTimeout);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
         
-        // Configuración adicional para PostgreSQL
         config.setConnectionTestQuery("SELECT 1");
         config.setValidationTimeout(5000);
         config.setLeakDetectionThreshold(60000);
         
-        // Propiedades específicas de PostgreSQL
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -117,7 +107,6 @@ public class DatabaseConfig {
         config.addDataSourceProperty("elideSetAutoCommits", "true");
         config.addDataSourceProperty("maintainTimeStats", "false");
         
-        // Configuración de pool
         config.setPoolName("InnoSistemas-HikariCP");
         config.setAutoCommit(true);
         
@@ -141,15 +130,15 @@ public class DatabaseConfig {
         em.setDataSource(dataSource);
         em.setPackagesToScan("com.udea.innosistemas.entity");
         
-        // Configurar el proveedor JPA (Hibernate)
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(false);
         vendorAdapter.setShowSql(showSql);
         em.setJpaVendorAdapter(vendorAdapter);
-        
-        // Propiedades de Hibernate
+
         em.setJpaProperties(hibernateProperties());
-        
+
+        em.afterPropertiesSet();
+
         return em;
     }
 
@@ -161,69 +150,27 @@ public class DatabaseConfig {
      */
     @Bean
     @Primary
-    public PlatformTransactionManager transactionManager(
-            LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+    public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean emf) {
         log.info("Configurando TransactionManager para JPA");
-        
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
-        
+        transactionManager.setEntityManagerFactory(emf.getObject());
         return transactionManager;
     }
 
-    /**
-     * Propiedades de configuración para Hibernate
-     * 
-     * @return Properties con la configuración de Hibernate
-     */
     private Properties hibernateProperties() {
-        Properties properties = new Properties();
-        
-        // Configuración básica
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);
-        properties.setProperty("hibernate.show_sql", String.valueOf(showSql));
-        properties.setProperty("hibernate.format_sql", "true");
-        properties.setProperty("hibernate.use_sql_comments", "true");
-        
-        // Configuración de naming strategy
-        properties.setProperty("hibernate.physical_naming_strategy",
-            "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
-        properties.setProperty("hibernate.implicit_naming_strategy",
-            "org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy");
-        
-        // Optimizaciones de rendimiento
-        properties.setProperty("hibernate.jdbc.batch_size", "20");
-        properties.setProperty("hibernate.order_inserts", "true");
-        properties.setProperty("hibernate.order_updates", "true");
-        properties.setProperty("hibernate.jdbc.batch_versioned_data", "true");
-        
-        // Configuración de cache (deshabilitado por defecto)
-        properties.setProperty("hibernate.cache.use_second_level_cache", "false");
-        properties.setProperty("hibernate.cache.use_query_cache", "false");
-        
-        // Configuración de estadísticas (habilitado solo en desarrollo)
-        properties.setProperty("hibernate.generate_statistics", "false");
-        
-        // Configuración de validación de esquema
-        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
-        
-        // Configuración específica para PostgreSQL
-        properties.setProperty("hibernate.dialect.storage_engine", "innodb");
-        properties.setProperty("hibernate.connection.provider_disables_autocommit", "true");
-        
-        // Configuración de timezone
-        properties.setProperty("hibernate.jdbc.time_zone", "America/Bogota");
-        
-        log.info("Propiedades de Hibernate configuradas - DDL Auto: {}", ddlAuto);
-        
-        return properties;
+        Properties props = new Properties();
+        props.setProperty("hibernate.hbm2ddl.auto", ddlAuto != null ? ddlAuto : "validate");
+        props.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+        props.setProperty("hibernate.jdbc.time_zone", "America/Bogota");
+        props.setProperty("hibernate.show_sql", String.valueOf(showSql));
+        props.setProperty("hibernate.jdbc.batch_size", "20");
+        props.setProperty("hibernate.cache.use_second_level_cache", "false");
+        props.setProperty("hibernate.generate_statistics", "false");
+        props.setProperty("hibernate.order_inserts", "true");
+        props.setProperty("hibernate.order_updates", "true");
+        return props;
     }
 
-    /**
-     * Configuración específica para el perfil de desarrollo
-     * Habilita configuraciones adicionales para debugging
-     */
     @Configuration
     @Profile("dev")
     static class DevelopmentDatabaseConfig {
@@ -239,10 +186,6 @@ public class DatabaseConfig {
         }
     }
 
-    /**
-     * Configuración específica para el perfil de producción
-     * Optimiza el rendimiento para ambiente productivo
-     */
     @Configuration
     @Profile("prod")
     static class ProductionDatabaseConfig {
