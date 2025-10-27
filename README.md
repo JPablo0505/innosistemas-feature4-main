@@ -1,5 +1,7 @@
 # InnoSistemas Backend - API GraphQL
 
+[![CI/CD Pipeline](https://github.com/JPablo0505/innosistemas-feature4-main/actions/workflows/build.yml/badge.svg)](https://github.com/JPablo0505/innosistemas-feature4-main/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=JPablo0505_innosistemas-feature4-main&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=JPablo0505_innosistemas-feature4-main) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=JPablo0505_innosistemas-feature4-main&metric=bugs)](https://sonarcloud.io/summary/new_code?id=JPablo0505_innosistemas-feature4-main) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=JPablo0505_innosistemas-feature4-main&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=JPablo0505_innosistemas-feature4-main) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=JPablo0505_innosistemas-feature4-main&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=JPablo0505_innosistemas-feature4-main) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=JPablo0505_innosistemas-feature4-main&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=JPablo0505_innosistemas-feature4-main)
+
 Plataforma de Integración y Desarrollo de Software para Estudiantes de Ingeniería de Sistemas - Universidad de Antioquia
 
 ## Descripción
