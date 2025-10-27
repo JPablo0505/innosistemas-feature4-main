@@ -80,19 +80,3 @@ jobs:
         with:
           name: app-jar
           path: target/*.jar
-
-  docker:
-    needs: build
-    name: Build & Push Docker image
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build & push Docker image
-        uses: mr-smithers-excellent/docker-build-push@v6
-        with:
-          image: jpablo0505/innosistemas
-          tags: latest
-          registry: docker.io
-          dockerfile: Dockerfile
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
