@@ -37,9 +37,9 @@ import java.util.Properties;
     entityManagerFactoryRef = "entityManagerFactory",
     transactionManagerRef = "transactionManager"
 )
-public class Prueba {
+public class DatabaseConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(Prueba.class);
+    private static final Logger log = LoggerFactory.getLogger(DatabaseConfig.class);
 
     @Value("${spring.datasource.url}")
     private String databaseUrl;
