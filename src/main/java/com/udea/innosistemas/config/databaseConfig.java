@@ -71,7 +71,7 @@ public class DatabaseConfig {
     @Value("${spring.jpa.hibernate.ddl-auto:validate}")
     private String ddlAuto;
 
-    @Value("${spring.jpa.show-sql:false}")
+    @Value("${spring.jpa.show-sql:false}" )
     private boolean showSql;
 
     /**
