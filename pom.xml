@@ -21,8 +21,8 @@
     <properties>
         <java.version>17</java.version>
         <jwt.version>0.12.3</jwt.version>
-        <sonar.projectKey>JPablo0505_innosistemas-feature4-main</sonar.projectKey>
-        <sonar.organization>jpablo0505</sonar.organization>
+        <sonar.projectKey>JAMESLEONARDGRIJALBABOLANOS_innosistemas-feature4</sonar.projectKey>
+        <sonar.organization>jamesleonardgrijalbabolanos</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 

@@ -32,4 +32,9 @@ public class AuthController {
     public ResponseEntity<String> health() {
         return ResponseEntity.ok("Auth service is running");
     }
+
+    @GetMapping("/")
+    public ResponseEntity<String> rootHealth() {
+        return ResponseEntity.ok("✅ Health OK - InnoSistemas backend is running");
+    }
 }
